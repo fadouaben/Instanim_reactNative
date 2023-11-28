@@ -14,7 +14,12 @@ export default function Auth({navigation}) {
       
       <Image source={require("../assets/logo3.png")}/>
       <View style={styles.authentif}>
-        <Text style={{fontSize:32, fontWeight:"bold",color:"white"}}>Authentification</Text>
+        <Text style={{color: '#225c70',
+                marginTop: 20,
+                fontWeight: '700',
+                fontSize: 24,
+                textAlign: 'center'
+                }}>Sign In</Text>
 
         <TextInput 
           onSubmitEditing={()=>{refinput2.current.focus()}}
@@ -34,7 +39,7 @@ export default function Auth({navigation}) {
           <Pressable
             onPress={()=>{
               auth.signInWithEmailAndPassword(email,pwd)
-              .then(()=>{navigation.replace('Home')})
+              .then(()=>{navigation.navigate('MainPage')})
               .catch ((err)=>{alert(err)})
             }}
             //title="Submit"
@@ -43,13 +48,14 @@ export default function Auth({navigation}) {
             </Pressable>
             
         </View>
+        
         <TouchableOpacity style={{alignItems:"flex-end",paddingRight:20,margin:12, width:"100%"}}>
           <Text  
             onPress={()=> {
               navigation.navigate("Register");
             }
           }
-            style={{color:"white", fontWeight:"bold", textDecorationLine:"underline"}}>
+            style={{color:"#5799b1", fontWeight:"bold", textDecorationLine:"underline"}}>
             Create New ?
           </Text>
         </TouchableOpacity>
@@ -88,7 +94,23 @@ const styles = StyleSheet.create({
     width:"85%",
     height:320,
     borderRadius: 50,
-    justifyContent:"center"
+    justifyContent:"center",
+    padding: 10,
+    backgroundColor: "#fdf9fa",
+    
+    position: 'relative',
+    textAlign :'justify',
+    padding: 16, // 1rem is assumed to be 16px
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
     
 
   },

@@ -13,11 +13,11 @@ export default function Register({navigation}) {
   const refinput2 = useRef()
 
   return (
-    <View style={styles.container}>
+    <View style={styles.container} >
       
       <Image source={require("../assets/logo3.png")}/>
       <View style={styles.authentif}>
-        <Text style={{fontSize:32, fontWeight:"bold",color:"white"}}>Registrer</Text>
+        <Text style={{fontSize:32, fontWeight:"bold",color: '#225c70'}}> Sign Up </Text>
 
         <TextInput 
           onSubmitEditing={()=>{refinput2.current.focus()}}
@@ -49,11 +49,12 @@ export default function Register({navigation}) {
             </Pressable>
              
         </View>
+        
         <TouchableOpacity style={{alignItems:"flex-end",paddingRight:20, width:"100%"}}>
           <Text  
             onPress={()=> {navigation.navigate("Auth");}
           }
-            style={{color:"white", fontWeight:"bold", textDecorationLine:"underline"}}>
+            style={{color:"#5799b1", fontWeight:"bold", textDecorationLine:"underline"}}>
             You have alrady an account ?
           </Text>
         </TouchableOpacity>
@@ -91,7 +92,23 @@ const styles = StyleSheet.create({
       width:"85%",
       height:390,
       borderRadius: 50,
-      justifyContent:"center"
+      justifyContent:"center",
+      backgroundColor: "#fdf9fa",
+    
+    position: 'relative',
+    textAlign :'justify',
+    padding: 16, // 1rem is assumed to be 16px
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 4,
+    },
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    elevation: 8,
+    alignItems: 'center',
+    justifyContent: 'center',
+    
   
     },
     button_conf:{
