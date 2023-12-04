@@ -6,9 +6,69 @@ import { Ionicons } from '@expo/vector-icons';
 import { searchbar } from '../../CommonCss/pagecss';
 import { TextInput } from 'react-native';
 import ChatCard from '../../Cards/ChatCard';
+const auth = firebase.auth();
+export default function AllChats({navigation}) {
+    const [chats, setChats] = useState(null);
+    const currentUser =auth.currentUser;
+    const currentId = currentUser.uid;
+    const MsgMap = new Map();
+    const [user, setUser] = useState({});
+    const [keyword, setKeyword] = useState('')
+    useEffect(()=>{
+        const fetchData = async () =>
+        {try{
+            const messagesRef = firebase.database().ref('messages');
+            
+            
+            messagesRef.on('value',snapshot => {
+              
+              if (snapshot.exists()){
+                 
+                snapshot.forEach(childSnp =>{
+                    const roomId = childSnp.key;
+                    const roomSpilt = roomId.split('_');
+                    if(roomSpilt.length>=3){
+                        if (roomSpilt[1] === currentId ||roomSpilt[1] === currentId){
+                            const roomRef = messagesRef.child(roomId);
+                            const roomMsgsRef = roomRef.child('messages');
 
-export default function AllChats() {
-    
+                            roomMsgsRef.orderByChild('date').limitToLast(1).on('value',msgsnap=>{
+                                msgsnap.forEach(msgchild =>{
+                                    const lastMsg = msgchild.val();
+                                    const otherId = roomSpilt[1] === currentId ? roomSpilt[2] : roomSpilt[1] ; 
+                                    if (!MsgMap.has(otherId) || lastMsg.date > MsgMap.get(otherId).message.date){
+                                        MsgMap.set(otherId,{message:lastMsg});
+                                    }
+
+                                });
+                            });
+                        }
+                        
+                    }
+
+                });
+                setChats(Array.from(MsgMap.entries)).sort((a, b) => b.date - a.date);
+                
+
+               
+              }
+            });
+        }catch(error){
+            console.error("Error get data",error);
+        }};
+
+        const fetchUser = async ()=>{
+            const refUser = firebase.database().ref('users');
+            const usersSnap = await refUser.once('value');
+            if (usersSnap.exists()){
+                const users = usersSnap.val();
+                setUser(users);
+            }
+        };
+
+        fetchData();
+        fetchUser();
+      },[]);
 
     
     
@@ -21,13 +81,31 @@ export default function AllChats() {
 
         <View style={styles.c1}>
             <Text style={styles.formHead2}>Your Chats</Text>
+            <Ionicons name="ios-add-circle-sharp" size={30} color="#225c70" onPress={()=>{
+                navigation.navigate('MessagePage',{currentId});
+
+                }}
+            />
             <TextInput style={searchbar} placeholder='Search'
                 onChangeText={(text)=>setKeyword(text)}
             />
         </View>
 
         <View style={styles.c2}>
-            
+            {
+                
+                chats !== null && chats.filter(
+                    (chat)=>{
+                        if (keyword == ''){
+                            return chat
+                        }
+                        else if (chat.username.toLowerCase().includes(keyword.toLowerCase()) || chat.message.toLowerCase().includes(keyword.toLowerCase())){
+                            return chat
+                        }
+                    }
+
+                ).map(([otherId,{message}])=>{ return <ChatCard username={user[otherId]?.name} message={message} navigation={navigation} otherId={otherId}/>})
+            }
         </View>        
     </ScrollView>
   )

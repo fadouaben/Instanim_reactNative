@@ -12,7 +12,7 @@ export default function Chat({navigation,route}) {
       <StatusBar/>
       <TopNavbar navigation={navigation} page={"Chat"} />
       <Bottomnavbar navigation={navigation} page={"Chat"}  />
-      <AllChats />
+      <AllChats navigation={navigation} />
     </View>
   )
 }

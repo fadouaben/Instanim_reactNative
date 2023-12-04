@@ -3,18 +3,9 @@ import React, { useEffect, useState } from 'react'
 import Bottomnavbar from '../Components/Bottomnavbar'
 import TopNavbar from '../Components/TopNavbar'
 import FollowersPost from '../Components/FollowersPost'
-import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const MainPage = ({navigation}) => {
-  const [userdata, setUserdata] =useState(null);
-  useEffect(()=>{
-    AsyncStorage.getItem('user')
-      .then(data => {
-        setUserdata(JSON.parse(data))
-      })
-      .catch(err => alert(err))
-
-  },[])
+  
   
   return (
     <View style={styles.container}>
