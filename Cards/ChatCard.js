@@ -14,13 +14,15 @@ export default function ChatCard({username,message,navigation,otherId}) {
 
 const styles = StyleSheet.create({
   ChatCard: {
-      backgroundColor: '#111111',
+      backgroundColor: '#cbedf9',
       width: '100%',
       marginTop: 10,
       borderRadius: 20,
       padding: 10,
       flexDirection: 'row',
       alignItems: 'center',
+      borderColor:'white',
+      borderWidth:1,
   },
   image: {
       width: 40,
@@ -28,7 +30,7 @@ const styles = StyleSheet.create({
       borderRadius: 50,
   },
   username: {
-      color: 'white',
+      color: '#225c70',
       fontSize: 20,
       fontWeight: 'bold',
   },
@@ -36,7 +38,7 @@ const styles = StyleSheet.create({
       marginLeft: 20,
   },
   lastmessage: {
-      color: 'gray',
-      fontSize: 19,
+      color: '#5799b1',
+      fontSize: 19, 
   }
 })

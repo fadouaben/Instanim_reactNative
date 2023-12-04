@@ -5,27 +5,48 @@ import {useState,useRef} from 'react'
 import { Image, Platform } from 'react-native';
 import { Pressable } from 'react-native';
 import firebase from '../Config';
+const storage = firebase.storage();
 
 import DateTimePicker from '@react-native-community/datetimepicker';
 const auth = firebase.auth();
 const database = firebase.database();
 
 export default function AddAnimal({route,navigation}) {
-  const {email,password,nomPrenom} = route.params;
+  console.log(route.params);
+  const {email,password,nomPrenom,uricod} = route.params;
   const [date, setDate] = useState(new Date());
-
+  //const [url, setUrl] = useState('');
   const [dateText, setDateText] = useState('');
-  /*const [showDatePicker, setShowDatePicker] = useState(false);
-  const onChange = (event, selectedDate) => {
-    
-    const currentDate = selectedDate || date;
-    setShowDatePicker(Platform.OS === 'ios'); 
-    setDate(currentDate);
+  const imageToBlob = async (uri) => {
+    const blob = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        resolve(xhr.response);
+      };
+      xhr.onerror = function (e) {
+        console.log(e);
+        reject(new TypeError("Network request failed"));
+      };
+      xhr.responseType = "blob"; //bufferArray
+      xhr.open("GET", uri, true);
+      xhr.send(null);
+    });
+    return blob;
   };
 
-  const showDatepicker = () => {
-    setShowDatePicker(true);
-  };*/
+  const uploadLocalImage = async (urilocal,userId)=>{
+    //covertir l'image  to blob 
+    const blob = await imageToBlob(urilocal);
+
+    //save blob to reference
+    const ref_mes_images = storage.ref().child('MesImages');
+    const ref_une_image = ref_mes_images.child('Image'+userId+'.png');
+    ref_une_image.put(blob);
+
+    //get uri
+    const uri =await ref_une_image.getDownloadURL();
+    return uri;
+  }
   const [showDatePicker, setShowDatePicker] = useState(false);
 
 
@@ -148,19 +169,25 @@ export default function AddAnimal({route,navigation}) {
         
 
         <Pressable
-            onPress={(e)=>{
+            onPress={async (e)=>{
+              //console.log(uricode);
                 if (nom === '' && type === ''){
                     setError('Enter important information (*)');
                     }
                 else{
-                    auth.createUserWithEmailAndPassword(email,password)
-                        .then((userCredential) => {
+                   await auth.createUserWithEmailAndPassword(email,password)
+                        .then(async (userCredential) => {
                             const userId = userCredential.user.uid;
+                            console.log(uricod)
+                            const url =await uploadLocalImage(uricod,userId);
+                            
+                            
                             const ref_users = database.ref("users");
                             const ref_unuser = ref_users.child('user'+userId);
                             ref_unuser.set({
                               id:userId,
                               name:nomPrenom,
+                              url:url,
                             
                             })
                             const ref_animals = database.ref("animals");

@@ -8,15 +8,70 @@ import firebase from '../Config';
 import DateTimePicker from '@react-native-community/datetimepicker';
 import { format } from 'date-fns';
 import { Platform } from 'react-native';
+import * as ImagePicker from 'expo-image-picker';
+
 const auth = firebase.auth();
 const database = firebase.database();
 
 export default function User({route,navigation}) {
+  
   const {email,password} = route.params;
   
   const [nom, setNom] = useState('');
   const [prenom, setPrenom] = useState('');
   const [error, setError] = useState('');
+  const [isDefault, setIsDefault] = useState(true);
+  const [uricod, setUricod] = useState();
+
+  const pickImage = async () => {
+    // No permissions request is necessary for launching the image library
+    let result = await ImagePicker.launchImageLibraryAsync({
+      mediaTypes: ImagePicker.MediaTypeOptions.All,
+      allowsEditing: true,
+      aspect: [4, 3],
+      quality: 1,
+    });
+
+    // console.log(result);
+
+    if (!result.canceled) {
+      /*setIsdefault(false);
+      seturlImage(result.assets[0].uri);*/
+      const uri = result.assets[0].uri;
+      setIsDefault(false);
+      setUricod(uri);
+    }
+  };
+  const imageToBlob = async (uri) => {
+    const blob = await new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.onload = function () {
+        resolve(xhr.response);
+      };
+      xhr.onerror = function (e) {
+        console.log(e);
+        reject(new TypeError("Network request failed"));
+      };
+      xhr.responseType = "blob"; //bufferArray
+      xhr.open("GET", uri, true);
+      xhr.send(null);
+    });
+    return blob;
+  };
+
+  /*const uploadLocalImage = async (urilocal)=>{
+    //covertir l'image  to blob 
+    const blob = await imageToBlob(urilocal);
+
+    //save blob to reference
+    const ref_mes_images = storage.ref().child('MesImages');
+    const ref_une_image = ref_mes_images.child('Image'+currentId+'.png');
+    ref_une_image.put(blob);
+
+    //get uri
+    const uri =await ref_une_image.getDownloadURL();
+    return uri;
+  }*/
   
   const linkAnimalToOwner = (ownerId, animalId) => {
     const ref_user_animals = database.ref(`user_animals/${ownerId}`);
@@ -27,27 +82,7 @@ export default function User({route,navigation}) {
     <View style={styles.container}>
       <Image source={require("../assets/logo3.png")}/>
       <View style={styles.addAnim}>
-        <Image source={require("../assets/poppy-removebg.png")} 
-            style={{
-                position: 'absolute',
-                zIndex: 1,
-                top: -150,
-                right: -10,
-                width: 150, 
-                height: 250, 
-            }}/>
-        <Image source={require("../assets/cat-removebg.png")}
-            style={{
-                position: 'absolute',
-                zIndex: 1,
-                bottom: -20,
-                left:-115,
-                width: 115, 
-                height: 450, 
-                
-                
-              }}
-        />
+       
         <Text style={{color: '#225c70',
                 marginTop: 20,
                 fontWeight: '700',
@@ -58,6 +93,15 @@ export default function User({route,navigation}) {
         </Text>
         <Text style={{textAlign: 'center',color:"#5799b1",fontSize:10}}>Continue with entering your pet's information.</Text>
         <Text style={{ color: 'red' }}>{error}</Text>
+        <TouchableOpacity style={{width:'50%',height:'20%',marginTop:5,marginBottom:30}} onPress={()=>{
+                  pickImage();
+                  
+
+                }}>
+                  <Image source={isDefault ?  require("../assets/images.png") : {uri:uricod}} 
+                      style={styles.image}
+                  />
+          </TouchableOpacity>
 
         <Text>Enter Your First Name *</Text>
 
@@ -89,7 +133,7 @@ export default function User({route,navigation}) {
                     }
                 else{
                     const nomPrenom = nom+" "+prenom
-                    navigation.navigate('AddAnimal',{email,password,nomPrenom});
+                    navigation.navigate('AddAnimal',{email,password,nomPrenom,uricod});
                     
                     }
                 
@@ -145,8 +189,8 @@ const styles = StyleSheet.create({
     height:500,
     padding: 10,
     backgroundColor: "#fdf9fa",
-    marginTop: 90,
-    marginLeft:70,
+    marginTop: 30,
+    marginLeft:20,
     position: 'relative',
     textAlign :'justify',
     padding: 16, // 1rem is assumed to be 16px
@@ -161,5 +205,15 @@ const styles = StyleSheet.create({
     elevation: 8,
     alignItems: 'center',
     justifyContent: 'center',
-  }
+  },
+  image:{
+    //padding: 10,
+    borderRadius: 200,
+    width:"100%",
+    justifyContent:'center',
+    height:"130%",
+   
+
+
+  },
 });

@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, StyleSheet } from 'react-native'
+import { View, Text, ScrollView, StyleSheet, FlatList } from 'react-native'
 import React, { useEffect,useState } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import firebase from '../../Config'
@@ -20,10 +20,11 @@ export default function AllChats({navigation}) {
             const messagesRef = firebase.database().ref('messages');
             
             
-            messagesRef.on('value',snapshot => {
+            const snapshot = await messagesRef.once('value')
+                console.log('Snapshot:', snapshot.val());
               
               if (snapshot.exists()){
-                 
+                const promises = [];
                 snapshot.forEach(childSnp =>{
                     const roomId = childSnp.key;
                     const roomSpilt = roomId.split('_');
@@ -31,8 +32,8 @@ export default function AllChats({navigation}) {
                         if (roomSpilt[1] === currentId ||roomSpilt[1] === currentId){
                             const roomRef = messagesRef.child(roomId);
                             const roomMsgsRef = roomRef.child('messages');
-
-                            roomMsgsRef.orderByChild('date').limitToLast(1).on('value',msgsnap=>{
+                            const promise = new Promise((resolve) => {
+                                roomMsgsRef.orderByChild('date').limitToLast(1).on('value',msgsnap=>{
                                 msgsnap.forEach(msgchild =>{
                                     const lastMsg = msgchild.val();
                                     const otherId = roomSpilt[1] === currentId ? roomSpilt[2] : roomSpilt[1] ; 
@@ -41,18 +42,28 @@ export default function AllChats({navigation}) {
                                     }
 
                                 });
-                            });
+                                resolve();
+                            });});
+                            promises.push(promise);
+                            
                         }
                         
                     }
 
                 });
-                setChats(Array.from(MsgMap.entries)).sort((a, b) => b.date - a.date);
+                console.log('MsgMap:', MsgMap);
+                await Promise.all(promises);
+                const dataToSet = Array.from(MsgMap.entries()).map(([otherId, { message }]) => ({
+                    otherId,
+                    message,
+                  }));
+                  console.log('Data to setChats:', dataToSet);
+                  setChats(dataToSet);
                 
 
                
-              }
-            });
+              
+            };
         }catch(error){
             console.error("Error get data",error);
         }};
@@ -74,15 +85,13 @@ export default function AllChats({navigation}) {
     
 
   return (
-    <ScrollView style={styles.container}>
-        <Ionicons name='chevron-back-circle' size={24} color="white" style={styles.gohomeicon}
-            onPress={()=>navigation.navigate('MainPage')}
-        />
+    <View style={styles.container}>
+       
 
         <View style={styles.c1}>
             <Text style={styles.formHead2}>Your Chats</Text>
             <Ionicons name="ios-add-circle-sharp" size={30} color="#225c70" onPress={()=>{
-                navigation.navigate('MessagePage',{currentId});
+                navigation.navigate('List_Profil');
 
                 }}
             />
@@ -92,22 +101,25 @@ export default function AllChats({navigation}) {
         </View>
 
         <View style={styles.c2}>
-            {
-                
-                chats !== null && chats.filter(
-                    (chat)=>{
-                        if (keyword == ''){
-                            return chat
-                        }
-                        else if (chat.username.toLowerCase().includes(keyword.toLowerCase()) || chat.message.toLowerCase().includes(keyword.toLowerCase())){
-                            return chat
-                        }
-                    }
-
-                ).map(([otherId,{message}])=>{ return <ChatCard username={user[otherId]?.name} message={message} navigation={navigation} otherId={otherId}/>})
-            }
+            <FlatList
+                data={chats}
+                keyExtractor={(item)=>item.otherId}
+                renderItem={({item})=>{
+                        console.log(item.otherId);
+                        console.log(user);
+                        console.log('user name '+user['user'+item.otherId]?.name);
+                    
+                      return (
+                        <ChatCard username={user['user'+item.otherId]?.name} message={item.message.msg} navigation={navigation} otherId={item.otherId}/>
+  
+                      )
+                    
+                    
+                }}
+            />
+         
         </View>        
-    </ScrollView>
+    </View>
   )
 }
 

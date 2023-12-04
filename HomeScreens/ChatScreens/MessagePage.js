@@ -3,27 +3,22 @@ import React, { useEffect , useState } from 'react'
 import { Ionicons } from '@expo/vector-icons'; 
 import firebase from '../../Config';
 import { TextInput } from 'react-native';
-
-
 export default function MessagePage({route}) {
     const [writing, setWriting] = useState(false);
 
     //data = [{nom :"fadoua", prenom:"ben", num:"25612266"},{nom :"firas", prenom:"ggg", num:"25612266"}]
-    const { currentId}=route.params;
-    const  userIdToSendMessage = 'plxvideFp6SZeiVS7p9x6T4762l1';
+    const { currentId,userIdToSendMessage}=route.params;
+    //const [userIdToSendMessage, setuserIdToSendMessage] = useState();
     const [couleur, setCouleur] = useState('#0005');
     const [msg, setMsg] = useState('');
     const [couleurb, setCouleurb] = useState('#0005');
     const [date, setDate] = useState(new Date())
     const [messagesEnv, setMessagesEnv] = useState([]);
     const [messagesRec, setMessagesRec] = useState([]);
-    if (!currentId || !userIdToSendMessage) {
-        console.error('currentId or userIdToSendMessage is undefined or null');
-        return;
-    }
-
+    
 
     useEffect(()=>{
+        //setuserIdToSendMessage ();
       const ref_messages = firebase.database().ref('messages');
 
       //messages que vous les envoyer
@@ -45,48 +40,45 @@ export default function MessagePage({route}) {
       });
 
       //message rçu
+      
       const ref_roomRec = ref_messages.child('room_'+userIdToSendMessage+'_'+currentId);
+      
       const ref_dist_writing = ref_roomRec.child('typing');
-      ref_dist_writing.on('value',(snapshot)=>{setWriting(snapshot.val());});
+      
+      ref_dist_writing.on('value',(snapshot)=>{if(snapshot.exists()){ console.log('Snapshot value:', snapshot.val());
+      setWriting(snapshot.val());} });
 
       const ref_messages_roomRec =ref_roomRec.child('messages');
 
       const messagesListRec=ref_messages_roomRec.on('value',(snapshot)=>{
-        const messagesData=snapshot.val();
-        if(messagesData){
-          const messagesArray = Object.keys(messagesData).map((key)=>({
-            id: key,
-            ...messagesData[key],
-          }));
-          setMessagesRec(messagesArray);
-        }
-        else{
-          setMessagesRec([]);
-        }
+        if(snapshot.exists()){
+            console.log('Snapshot value:', snapshot.val());
+            const messagesData=snapshot.val();
+            if(messagesData){
+              const messagesArray = Object.keys(messagesData).map((key)=>({
+                id: key,
+                ...messagesData[key],
+              }));
+              setMessagesRec(messagesArray);
+            }
+            else{
+              setMessagesRec([]);
+            }}
+        
       });
 
 
 
       return ()=>{
-        ref_room.off('value',messagesList);
-        ref_roomRec.off('value',messagesListRec);
+        //ref_room.off('value',messagesList);
+        //ref_roomRec.off('value',messagesListRec);
       };
 
-    },[currentId,userIdToSendMessage]);
+    },[currentId]);
 
     const allMsgs=[...messagesEnv, ...messagesRec];
     const sortMsgs = allMsgs.sort((a,b)=> new Date(a.date).getTime() - new Date(b.date).getTime());
-      /*const dateA =new Date(a.date).getTime() ;
-      const dateB =  new Date(b.date).getTime();
-      if (dateA === dateB){
-        return a.id.localCompare(b.id);
-      }
-      else {
-        return dateA - dateB;
-      }*/
-    
-    
-      //new Date(a.date).getTime() - new Date(b.date).getTime()};
+      
   return ( 
     <View style={styles.container}>
      {/* <StatusBar style="auto" />
@@ -168,8 +160,7 @@ export default function MessagePage({route}) {
                 
                 <Ionicons name="send-sharp" size={30} color={msg.length > 0 ? 'black' : 'gray'} disabled={msg.length <= 0}  onPress={
                   ()=>{
-                    //console.log(new Date("2023-12-03T20:24:09.147Z").getTime()-new Date("2023-12-03T20:18:00.699Z").getTime());
-                    //setDate(new Date());
+                    
                     const ref_messages = firebase.database().ref('messages');
                     const ref_room = ref_messages.child('room_'+currentId+'_'+userIdToSendMessage);
                     const ref_messages_room =ref_room.child('messages');

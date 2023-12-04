@@ -17,6 +17,7 @@ import AddPost from './HomeScreens/AddPost';
 import AllChats from './HomeScreens/ChatScreens/AllChats';
 import User from './Screens/User';
 import MessagePage from './HomeScreens/ChatScreens/MessagePage'
+import List_Profil from './HomeScreens/ChatScreens/List_Profil';
 export default function App() {
   const Stack = createNativeStackNavigator();
 
@@ -88,6 +89,10 @@ export default function App() {
         <Stack.Screen
           name='MessagePage'
           component={MessagePage}
+        />
+        <Stack.Screen
+          name='List_Profil'
+          component={List_Profil}
         />
         
       </Stack.Navigator>
