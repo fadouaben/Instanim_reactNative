@@ -4,6 +4,8 @@ import {useState,useRef} from 'react'
 import { Image } from 'react-native';
 import { Pressable } from 'react-native';
 import firebase from '../Config';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+
 const auth = firebase.auth();
 export default function Auth({navigation}) {
   const [email,setEmail]=useState("A");
@@ -39,7 +41,9 @@ export default function Auth({navigation}) {
           <Pressable
             onPress={()=>{
               auth.signInWithEmailAndPassword(email,pwd)
-              .then(()=>{navigation.navigate('MainPage')})
+              .then(async ()=>{
+                await AsyncStorage.setItem('user', JSON.stringify(auth.currentUser));
+                navigation.navigate('MainPage',auth.currentUser)})
               .catch ((err)=>{alert(err)})
             }}
             //title="Submit"

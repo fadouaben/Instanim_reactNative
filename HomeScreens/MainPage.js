@@ -15,12 +15,13 @@ const MainPage = ({navigation}) => {
       .catch(err => alert(err))
 
   },[])
+  
   return (
     <View style={styles.container}>
       
       
       <StatusBar/>
-      <TopNavbar navigation={navigation} page={"MainPage"} />
+      <TopNavbar navigation={navigation} page={"MainPage"}  />
       <FollowersPost/>
       <Bottomnavbar navigation={navigation} page={"MainPage"} />
 

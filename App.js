@@ -13,7 +13,9 @@ import MainPage from './HomeScreens/MainPage';
 import Chat from './HomeScreens/Chat';
 import MyPets from './HomeScreens/Chat';
 import Profil from './HomeScreens/Profil';
-
+import AddPost from './HomeScreens/AddPost';
+import AllChats from './HomeScreens/ChatScreens/AllChats';
+import User from './Screens/User';
 export default function App() {
   const Stack = createNativeStackNavigator();
 
@@ -69,6 +71,18 @@ export default function App() {
         <Stack.Screen
           name= "Profil"
           component = {Profil}
+        />
+        <Stack.Screen
+          name= "AddPost"
+          component = {AddPost}
+        />
+        <Stack.Screen
+          name= "AllChat"
+          component = {AllChats}
+        />
+        <Stack.Screen
+          name= "User"
+          component = {User}
         />
         
         

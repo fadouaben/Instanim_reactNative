@@ -7,7 +7,7 @@ import { MaterialIcons } from '@expo/vector-icons';
 import { FontAwesome5 } from '@expo/vector-icons';
 import { FontAwesome } from '@expo/vector-icons';
 
-const TopNavbar = ({ navigation, page }) => {
+const TopNavbar = ({ navigation, page,currentUser }) => {
 
     // console.log(page)
     return (
@@ -15,18 +15,23 @@ const TopNavbar = ({ navigation, page }) => {
             
 
             <Image source={logo} style={logo2} />
+            <Ionicons name="ios-add-circle-sharp" size={30} color="#225c70" onPress={()=>{
+                navigation.navigate('AddPost',{currentUser})
+
+                }}
+            />
                 <View style={styles.page}>
                 {page === 'MyPets' ? (
                         <FontAwesome5 name="dog" size={24} color="#225c70"  style={[styles.activeicons1,{marginRight:25,}]}  onPress
                             ={
-                                () => navigation.navigate('MyPets')
+                                () => navigation.navigate('MyPets',{currentUser})
                             } 
                         />   
                     ) : 
                     (
                         <FontAwesome5 name="dog" size={24} color="#225c70"  style={[icons1,{marginRight:25,}]}  onPress
                             ={
-                                () => navigation.navigate('MyPets')
+                                () => navigation.navigate('MyPets',{currentUser})
                             } 
                         />   
                     )
@@ -35,14 +40,14 @@ const TopNavbar = ({ navigation, page }) => {
                 {page === 'Chat' ? (
                         <Ionicons name="chatbubbles" size={24} color="#225c70" style={[styles.activeicons1,{marginRight:15,}]} onPress
                             ={
-                                () => navigation.navigate('Chat')
+                                () => navigation.navigate('Chat',{currentUser})
                             } 
                         />  
                     ) : 
                     (
                         <Ionicons name="chatbubbles" size={24} color="#225c70" style={[icons1,{marginRight:15,}]} onPress
                             ={
-                                () => navigation.navigate('Chat')
+                                () => navigation.navigate('Chat',{currentUser})
                             } 
                     />  
                     )
@@ -50,14 +55,14 @@ const TopNavbar = ({ navigation, page }) => {
                 {page === 'Profil' ? (
                         <FontAwesome name="user" size={24} color="#225c70" style={[styles.activeicons1,{marginRight:15,}]} onPress
                             ={
-                                () => navigation.navigate('Profil')
+                                () => navigation.navigate('Profil',{currentUser})
                             } 
                         />  
                     ) : 
                     (
                         <FontAwesome name="user" size={24} color="#225c70" style={[icons1,{marginRight:15,}]} onPress
                             ={
-                                () => navigation.navigate('Profil')
+                                () => navigation.navigate('Profil',{currentUser})
                             } 
                     />  
                     )

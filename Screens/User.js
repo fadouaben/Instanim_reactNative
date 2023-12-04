@@ -2,57 +2,22 @@ import React from 'react'
 import { StatusBar } from 'expo-status-bar';
 import { BackHandler,  ImageBackground, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
 import {useState,useRef} from 'react'
-import { Image, Platform } from 'react-native';
+import { Image } from 'react-native';
 import { Pressable } from 'react-native';
 import firebase from '../Config';
-
 import DateTimePicker from '@react-native-community/datetimepicker';
+import { format } from 'date-fns';
+import { Platform } from 'react-native';
 const auth = firebase.auth();
 const database = firebase.database();
 
-export default function AddAnimal({route,navigation}) {
-  const {email,password,nomPrenom} = route.params;
-  const [date, setDate] = useState(new Date());
-
-  const [dateText, setDateText] = useState('');
-  /*const [showDatePicker, setShowDatePicker] = useState(false);
-  const onChange = (event, selectedDate) => {
-    
-    const currentDate = selectedDate || date;
-    setShowDatePicker(Platform.OS === 'ios'); 
-    setDate(currentDate);
-  };
-
-  const showDatepicker = () => {
-    setShowDatePicker(true);
-  };*/
-  const [showDatePicker, setShowDatePicker] = useState(false);
-
-
+export default function User({route,navigation}) {
+  const {email,password} = route.params;
   
-  
-  const toggleDatepicker = () => {
-    setShowDatePicker(!showDatePicker);
-  };
-
-  const onDateChange = ({type}, selectedDate) => {
-    if (type == "set"){
-      const currentDate = selectedDate;
-      setDate(currentDate);
-      if (Platform.OS === 'android'){
-        toggleDatepicker();
-        setDateText(currentDate.toDateString());
-      }
-    }
-    else{
-      toggleDatepicker();
-    }
-    
-  };
-
   const [nom, setNom] = useState('');
-  const [type, setType] = useState('');
+  const [prenom, setPrenom] = useState('');
   const [error, setError] = useState('');
+  
   const linkAnimalToOwner = (ownerId, animalId) => {
     const ref_user_animals = database.ref(`user_animals/${ownerId}`);
     ref_user_animals.push(animalId);
@@ -89,12 +54,12 @@ export default function AddAnimal({route,navigation}) {
                 fontSize: 24,
                 textAlign: 'center',
                 }}>
-        Add Animal
+            Personal Information
         </Text>
         <Text style={{textAlign: 'center',color:"#5799b1",fontSize:10}}>Continue with entering your pet's information.</Text>
         <Text style={{ color: 'red' }}>{error}</Text>
 
-        <Text>Enter Your Pet's Name *</Text>
+        <Text>Enter Your First Name *</Text>
 
         <TextInput 
           
@@ -104,76 +69,27 @@ export default function AddAnimal({route,navigation}) {
           onChangeText={(text) => setNom(text)}
           
         ></TextInput>      
-        <Text>Choose Your Pet's Type *</Text>
+        <Text>Choose Your Last Name *</Text>
 
         <TextInput 
           
           blurOnSubmit={false}
           style={styles.textinput} 
-          placeholder='Type'
-          onChangeText={(text) => setType(text)}
+          placeholder='Prenom'
+          onChangeText={(text) => setPrenom(text)}
         ></TextInput>   
            
-        <Text>Choose Your Pet's Birth *</Text>
-        {
-          showDatePicker && (
-            <DateTimePicker
-              mode='date'
-              disabled="spinner"
-              value={date}
-              onChange={onDateChange}
-            />
-          )
-        }
-
-        {
-          !showDatePicker && (
-            <Pressable
-            onPress={toggleDatepicker}
-            >
-              <TextInput 
-                style={styles.textinput} 
-                placeholder='Sat Dec 21 2023'
-                value={dateText}
-                editable={false}
-                onChangeText={(text) => setDateText(text)}
-              />  
-            </Pressable>
-          )
-        }
-
-       
-
         
         
 
         <Pressable
             onPress={(e)=>{
-                if (nom === '' && type === ''){
+                if (nom === '' || prenom === '' ){
                     setError('Enter important information (*)');
                     }
                 else{
-                    auth.createUserWithEmailAndPassword(email,password)
-                        .then((userCredential) => {
-                            const userId = userCredential.user.uid;
-                            const ref_users = database.ref("users");
-                            const ref_unuser = ref_users.child('user'+userId);
-                            ref_unuser.set({
-                              id:userId,
-                              name:nomPrenom,
-                            
-                            })
-                            const ref_animals = database.ref("animals");
-                            const key = ref_animals.push().key;
-                            const ref_unanimal = ref_animals.child("animal" + key);
-                            ref_unanimal.set({
-                                name:nom,
-                                type:type,
-                                daten:dateText,
-                            });
-                            linkAnimalToOwner(userId, key);
-                            navigation.navigate('Auth');})
-                        .catch ((err) => { alert(err)});
+                    const nomPrenom = nom+" "+prenom
+                    navigation.navigate('AddAnimal',{email,password,nomPrenom});
                     
                     }
                 

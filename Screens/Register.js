@@ -39,7 +39,7 @@ export default function Register({navigation}) {
           <Pressable
             onPress={()=>{
                 if (pwd == confirm){
-                    navigation.navigate('AddAnimal',{email,password:pwd});
+                    navigation.navigate('User',{email,password:pwd});
         
                     }
             }}
